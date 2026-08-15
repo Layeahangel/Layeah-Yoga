@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>신청서 — 라예요가 9월</title>
+<meta name="description" content="라예요가 9월 신규 수업 신청서. 차크라(수) · 프라나야마(금), 매주 낮 12시, 스튜디오쿨라.">
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --ivory:#EFEBE0; --ivory-deep:#E4DFD1; --oat:#D8D0BD;
+    --olive:#3F4A38; --sage:#8A9A7B;
+    --rose:#9B7C74; --rose-deep:#8F6B63; --rose-soft:#E7DCD7;
+    /* 수업 구분색 — index.html 의 9월 달력과 같은 값 */
+    --cal-rose:#E0CEC8; --cal-blue:#C6D4DA;
+    --ink:#2E2A25; --ink-soft:#6B635A;
+    --serif:"Nanum Myeongjo","Apple SD Gothic Neo",AppleMyungjo,"Batang",serif;
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--ivory);color:var(--ink);font-family:var(--sans);
+       font-size:16px;line-height:1.75;letter-spacing:-.01em;word-break:keep-all;
+       min-height:100vh;display:flex;flex-direction:column}
+  .wrap{width:100%;max-width:520px;margin:0 auto;padding:0 28px}
+
+  /* ── 상단: 진행 표시 ── */
+  .top{position:sticky;top:0;z-index:10;background:var(--ivory);padding-top:22px}
+  .topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .back{background:none;border:0;font:inherit;font-size:14px;color:var(--sage);
+        cursor:pointer;padding:6px 0}
+  .back[hidden]{visibility:hidden;display:block !important}
+  .count{font-size:13px;color:var(--ink-soft);letter-spacing:.06em}
+  .track{height:2px;background:var(--oat)}
+  .bar{height:2px;background:var(--rose-deep);width:0;transition:width .35s ease}
+
+  /* ── 본문 ── */
+  main{flex:1;display:flex;flex-direction:column;justify-content:center;
+       padding:44px 0 40px}
+  .step[hidden]{display:none}
+  .q{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.5;
+     letter-spacing:-.02em;color:var(--olive);margin-bottom:14px}
+  /* 단계가 바뀔 때 제목으로 포커스를 옮깁니다. 그래야 스크린리더가 새 질문을
+     읽어줍니다. 다만 tabindex="-1" 이라 키보드로는 닿지 않는 자리이므로,
+     눈에 보이는 포커스 링은 지웁니다. 클릭한 것처럼 보이기만 합니다. */
+  .q:focus{outline:none}
+  .help{font-size:14px;color:var(--ink-soft);line-height:1.75;margin-bottom:28px}
+
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:13px;background:#fff;
+       border:1px solid var(--oat);padding:17px 18px;cursor:pointer;
+       transition:border-color .15s,background .15s}
+  .opt:has(input:checked){border-color:var(--rose);background:var(--rose-soft)}
+  .opt input{margin-top:5px;accent-color:var(--rose-deep);width:19px;height:19px;flex:none}
+  .opt .t{font-size:16px}
+  .opt .s{display:block;font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.6}
+
+  label.lb{display:block;font-size:14px;color:var(--ink-soft);margin:0 0 8px}
+  input[type=text],input[type=tel],textarea{
+    width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;
+    border:1px solid var(--oat);border-radius:0;padding:15px 16px;-webkit-appearance:none}
+  textarea{min-height:140px;resize:vertical;line-height:1.7}
+  /* 텍스트 입력칸에만 적용합니다. input:focus 로 두면 라디오·체크박스까지 잡혀
+     동그란 컨트롤 주위에 사각 테두리가 그려집니다. */
+  input[type=text]:focus,input[type=tel]:focus,textarea:focus{
+    outline:2px solid var(--sage);outline-offset:-1px}
+  /* 선택지는 키보드로 이동했을 때만 테두리를 보입니다. 마우스·터치로 고를 때는
+     카드 전체가 로즈색으로 바뀌는 것이 이미 선택 표시입니다. */
+  .opt input:focus-visible{outline:2px solid var(--sage);outline-offset:3px}
+  .gap{margin-bottom:20px}
+
+  /* ── 확인 단계 ── */
+  .review{border-top:1px solid var(--oat)}
+  .review .row{display:flex;gap:16px;padding:15px 0;border-bottom:1px solid var(--oat);font-size:15px}
+  .review .k{width:96px;flex:none;color:var(--ink-soft);font-size:14px}
+  .review .v{flex:1;white-space:pre-wrap}
+  .review .v.empty{color:var(--sage)}
+  .review .edit{background:none;border:0;font:inherit;font-size:13px;color:var(--sage);
+                cursor:pointer;padding:0;text-decoration:underline;flex:none}
+
+  .consent{margin-top:34px}
+  .cbox{background:var(--ivory-deep);padding:16px 18px;font-size:13px;line-height:1.8;
+        color:var(--ink-soft);margin-bottom:10px}
+  .cbox b{font-weight:400;color:var(--olive)}
+
+
+  /* ── 시작일 달력 ── */
+  .cal-head{text-align:center;font-family:var(--serif);font-size:20px;color:var(--olive);
+            margin-bottom:14px}
+  .legend{display:flex;gap:18px;justify-content:center;font-size:13px;
+          color:var(--ink-soft);margin-bottom:20px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;
+       margin-right:7px;vertical-align:-1px}
+  .dot.w{background-color:var(--cal-rose)} .dot.f{background-color:var(--cal-blue)}
+  table.cal{width:100%;border-collapse:collapse;table-layout:fixed;text-align:center}
+  table.cal th{padding:0 0 12px;font-size:12px;font-weight:400;color:var(--sage);
+               letter-spacing:.08em}
+  table.cal td{padding:3px 0;font-size:14px;color:var(--oat);height:52px}
+  .d{width:44px;height:44px;border:0;border-radius:50%;background:none;
+     font:inherit;font-size:15px;color:var(--ink);cursor:pointer;
+     /* 아래 선택 상태가 덮어쓸 수 있도록 background 단축 대신 longhand 사용 */
+     transition:background .15s,color .15s}
+  .d.w{background-color:var(--cal-rose)} .d.f{background-color:var(--cal-blue)}
+  .d:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+  /* .d.w / .d.f 와 특이도가 같아 순서에만 기대면 불안정하므로 한 단계 올립니다 */
+  .cal .d[aria-pressed="true"]{background-color:var(--rose-deep);color:#fff}
+  .off{display:inline-grid;place-items:center;width:44px;height:44px;
+       border:1px dashed var(--rose);border-radius:50%;color:var(--rose);font-size:14px}
+  .picked{margin-top:22px;padding:15px 18px;background:var(--ivory-deep);
+          font-size:15px;text-align:center;color:var(--ink)}
+  .picked.none{color:var(--ink-soft)}
+
+  /* ── 하단 버튼 ── */
+  .foot{position:sticky;bottom:0;background:var(--ivory);
+        padding:14px 0 calc(20px + env(safe-area-inset-bottom));
+        box-shadow:0 -14px 18px var(--ivory)}
+  .btn{width:100%;font:inherit;font-size:17px;color:#fff;background:var(--rose-deep);
+       border:0;padding:19px;cursor:pointer;letter-spacing:.02em;
+       display:block;text-align:center;text-decoration:none}
+  .btn:disabled{background:var(--oat);cursor:default}
+  .skip{width:100%;background:none;border:0;font:inherit;font-size:14px;
+        color:var(--ink-soft);cursor:pointer;padding:14px 0 2px;text-decoration:underline}
+  .err{background:var(--rose-soft);color:#6E524B;padding:14px 16px;font-size:14px;
+       line-height:1.65;margin-bottom:12px}
+  /* 오류는 버튼 위에 떠 있게 합니다. 흐름에 끼워두면 카드가 나타날 때 버튼이
+     아래로 밀려, 방금 누른 자리에서 버튼이 도망갑니다. */
+  .foot .wrap{position:relative}
+  /* 함정 칸: 사람 눈에도 스크린리더에도 잡히지 않게 두고, 값이 차면 봇으로 봅니다.
+     display:none 은 일부 봇이 건너뛰므로 화면 밖으로 밀어냅니다. */
+  .trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .foot .err{position:absolute;left:28px;right:28px;bottom:calc(100% + 10px);
+             margin:0;box-shadow:0 6px 20px rgba(46,42,37,.10)}
+  .warn{background:#F3E7C9;color:#6B5720;padding:14px 16px;font-size:13px;
+        line-height:1.7;margin-bottom:20px}
+
+  /* ── 동의 시트 ── */
+  .scrim{position:fixed;inset:0;background:rgba(46,42,37,.42);z-index:100;
+         opacity:0;transition:opacity .22s ease}
+  .scrim.on{opacity:1}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:101;
+         background:var(--ivory);max-height:88vh;overflow-y:auto;
+         padding:30px 28px calc(28px + env(safe-area-inset-bottom));
+         transform:translateY(100%);transition:transform .26s ease}
+  .sheet.on{transform:translateY(0)}
+  @media (prefers-reduced-motion:reduce){
+    .scrim,.sheet{transition:none}
+  }
+  @media (min-width:560px){
+    .sheet{left:50%;right:auto;bottom:auto;top:50%;width:496px;
+           transform:translate(-50%,-46%);border:1px solid var(--oat)}
+    .sheet.on{transform:translate(-50%,-50%)}
+  }
+  .sheet h2{font-family:var(--serif);font-weight:400;font-size:23px;color:var(--olive);
+            line-height:1.5;letter-spacing:-.02em;margin-bottom:8px}
+  .sheet .lede{font-size:14px;color:var(--ink-soft);margin-bottom:24px}
+  .sheet .btn{margin-top:22px}
+  .sheet .cancel{width:100%;background:none;border:0;font:inherit;font-size:14px;
+                 color:var(--ink-soft);cursor:pointer;padding:15px 0 2px;text-decoration:underline}
+
+  /* ── 시작 / 완료 화면 ── */
+  .center{text-align:center}
+  .center h1{font-family:var(--serif);font-weight:400;font-size:31px;line-height:1.5;
+             color:var(--olive);margin-bottom:18px;letter-spacing:-.02em}
+  .center p{font-size:15px;color:var(--ink-soft);line-height:1.85;margin-bottom:14px}
+  .summary{background:var(--ivory-deep);padding:18px 20px;font-size:14px;
+           line-height:1.9;text-align:left;margin:26px 0 8px}
+  .summary b{font-weight:400;color:var(--olive)}
+  .mark{width:74px;height:74px;border:1px solid var(--oat);border-radius:50%;
+        display:grid;place-items:center;margin:0 auto 28px;
+        font-family:var(--serif);font-size:29px;color:var(--sage)}
+  .center a{color:var(--sage)}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+
+<!-- ══════ 질문 흐름 ══════ -->
+<form id="flow">
+
+  <div class="trap" aria-hidden="true">
+    <label for="website">이 칸은 비워두세요</label>
+    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+  </div>
+
+  <div class="top">
+    <div class="wrap">
+      <div class="topline">
+        <button class="back" id="backBtn" type="button">← 뒤로</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="track"><div class="bar" id="bar"></div></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="wrap">
+
+      <!-- 2 ─ 수강권 -->
+      <section class="step" data-key="pass" hidden>
+        <h2 class="q" tabindex="-1">수강권을<br>골라주세요</h2>
+        <p class="help">9월에 열리는 수업은 수요일 5회, 금요일 3회로 모두 8회입니다.</p>
+        <div class="opts">
+          <label class="opt">
+            <input type="radio" name="pass" value="1회권 30,000원">
+            <span class="t">1회권<span class="s">30,000원</span></span>
+          </label>
+          <label class="opt">
+            <input type="radio" name="pass" value="4회권 110,000원">
+            <span class="t">4회권<span class="s">110,000원 · 4주 내 사용</span></span>
+          </label>
+          <label class="opt">
+            <input type="radio" name="pass" value="9월 전체 패스 200,000원">
+            <span class="t">9월 전체 패스<span class="s">200,000원 · 8회, 9월에 열리는 수업 모두</span></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 오고 싶은 날짜 -->
+      <section class="step" data-key="dates" hidden>
+        <h2 class="q" tabindex="-1">언제<br>오시겠어요?</h2>
+        <p class="help" id="datesHelp">수업이 열리는 날만 고르실 수 있습니다.</p>
+        <input type="hidden" id="dates" value="">
+        <div class="cal-head">2026. 9</div>
+        <div class="legend">
+          <span><i class="dot w"></i>수 · 차크라</span>
+          <span><i class="dot f"></i>금 · 프라나야마</span>
+        </div>
+        <table class="cal">
+          <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+          <tbody>
+          <tr><td></td><td></td><td>1</td><td><button type="button" class="d w" data-date="9월 2일" data-cls="차크라" aria-pressed="false" aria-label="9월 2일 수요일 차크라">2</button></td><td>3</td><td><button type="button" class="d f" data-date="9월 4일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 4일 금요일 프라나야마">4</button></td><td>5</td></tr>
+          <tr><td>6</td><td>7</td><td>8</td><td><button type="button" class="d w" data-date="9월 9일" data-cls="차크라" aria-pressed="false" aria-label="9월 9일 수요일 차크라">9</button></td><td>10</td><td><button type="button" class="d f" data-date="9월 11일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 11일 금요일 프라나야마">11</button></td><td>12</td></tr>
+          <tr><td>13</td><td>14</td><td>15</td><td><button type="button" class="d w" data-date="9월 16일" data-cls="차크라" aria-pressed="false" aria-label="9월 16일 수요일 차크라">16</button></td><td>17</td><td><button type="button" class="d f" data-date="9월 18일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 18일 금요일 프라나야마">18</button></td><td>19</td></tr>
+          <tr><td>20</td><td>21</td><td>22</td><td><button type="button" class="d w" data-date="9월 23일" data-cls="차크라" aria-pressed="false" aria-label="9월 23일 수요일 차크라">23</button></td><td>24</td><td><span class="off">25</span></td><td>26</td></tr>
+          <tr><td>27</td><td>28</td><td>29</td><td><button type="button" class="d w" data-date="9월 30일" data-cls="차크라" aria-pressed="false" aria-label="9월 30일 수요일 차크라">30</button></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <p class="picked none" id="picked" aria-live="polite">9/25는 추석 연휴로 쉽니다</p>
+      </section>
+
+      <!-- 3 ─ 요가 경험 -->
+      <section class="step" data-key="experience" data-optional hidden>
+        <h2 class="q" tabindex="-1">요가는<br>처음이신가요?</h2>
+        <p class="help">편안한 난이도라 처음이셔도 괜찮습니다. 수업을 준비하는 데 참고하려 여쭙습니다. 답하지 않고 넘어가셔도 괜찮습니다.</p>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="experience" value="처음입니다"><span class="t">처음입니다</span></label>
+          <label class="opt"><input type="radio" name="experience" value="조금 해봤습니다"><span class="t">조금 해봤습니다</span></label>
+          <label class="opt"><input type="radio" name="experience" value="꾸준히 하고 있습니다"><span class="t">꾸준히 하고 있습니다</span></label>
+        </div>
+      </section>
+
+      <!-- 4 ─ 임신 여부 -->
+      <section class="step" data-key="pregnant" data-optional hidden>
+        <h2 class="q" tabindex="-1">임신 중이신가요?</h2>
+        <p class="help">임신 중이셔도 참여하실 수 있습니다. 그에 맞춰 안내해 드리려 여쭙는 것이니, 답하지 않고 넘어가셔도 괜찮습니다.</p>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="pregnant" value="해당 없음"><span class="t">해당 없음</span></label>
+          <label class="opt"><input type="radio" name="pregnant" value="임신 중"><span class="t">임신 중입니다</span></label>
+        </div>
+      </section>
+
+      <!-- 5 ─ 특이사항 -->
+      <section class="step" data-key="notes" data-optional hidden>
+        <h2 class="q" tabindex="-1">몸에 불편한 곳이<br>있으신가요?</h2>
+        <p class="help">부상, 질환, 자주 뭉치는 부위, 그밖에 미리 알아두면 좋을 점을 편하게 적어주세요. 없으시면 비워두셔도 괜찮습니다.</p>
+        <textarea name="notes" aria-label="몸의 특이사항"></textarea>
+      </section>
+
+      <!-- 6 ─ 연락처 -->
+      <section class="step" data-key="contact" hidden>
+        <h2 class="q" tabindex="-1">연락처를<br>남겨주세요</h2>
+        <p class="help">확인 후 결제 안내와 수업 공지를 보내드립니다.</p>
+        <div class="gap">
+          <label class="lb" for="name">이름</label>
+          <input type="text" id="name" name="name" autocomplete="name">
+        </div>
+        <div>
+          <label class="lb" for="phone">연락처</label>
+          <input type="tel" id="phone" name="phone" inputmode="tel"
+                 autocomplete="tel" placeholder="010-0000-0000">
+        </div>
+      </section>
+
+      <!-- 7 ─ 확인 및 동의 -->
+      <section class="step" data-key="review" hidden>
+        <h2 class="q" tabindex="-1">이대로<br>보내드릴까요?</h2>
+        <p class="help">고치실 부분이 있으면 오른쪽 수정을 눌러주세요.</p>
+        <div class="review" id="review"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="foot">
+    <div class="wrap">
+      <div class="err" id="err" role="alert" hidden></div>
+      <button class="btn" id="nextBtn" type="button">다음</button>
+      <button class="skip" id="skipBtn" type="button" hidden>건너뛰기</button>
+    </div>
+  </div>
+</form>
+
+<!-- ══════ 동의 시트 ══════ -->
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <h2 id="sheetTitle" tabindex="-1">보내기 전에<br>동의가 필요합니다</h2>
+  <p class="lede">아래 내용을 확인해주세요.</p>
+
+  <div class="cbox">
+    <b>개인정보 수집 · 이용 동의</b><br>
+    수집 항목: 이름, 연락처, 수강권, 요가 경험<br>
+    이용 목적: 수업 신청 접수, 결제 및 수업 안내<br>
+    보유 기간: 수업 종료 후 3개월 이내 파기
+  </div>
+  <label class="opt">
+    <input type="checkbox" id="consent">
+    <span class="t">개인정보 수집 · 이용에 동의합니다</span>
+  </label>
+
+  <div id="healthConsent" hidden>
+    <div class="cbox" style="margin-top:20px">
+      <b>건강정보 수집 · 이용 동의</b><br>
+      수집 항목: 임신 여부, 몸의 특이사항<br>
+      이용 목적: 안전한 수업 진행을 위한 사전 확인<br>
+      보유 기간: 수업 종료 후 즉시 파기<br>
+      안전한 수업 진행을 위해 꼭 필요한 항목이라 동의를 받고 있습니다.
+      해당 사항이 없으시면 비워두셔도 괜찮습니다.
+    </div>
+    <label class="opt">
+      <input type="checkbox" id="consentHealth">
+      <span class="t">건강정보 수집 · 이용에 동의합니다</span>
+    </label>
+  </div>
+
+  <div class="warn" id="setupWarn" hidden style="margin-top:18px;margin-bottom:0">
+    아직 접수 주소가 연결되지 않았습니다. <code>apply.html</code>의
+    <code>ENDPOINT</code> 값을 채워주세요. 설정 방법은 <code>신청폼/README.md</code>에 있습니다.
+  </div>
+  <div class="err" id="sheetErr" role="alert" hidden style="margin-top:18px;margin-bottom:0"></div>
+  <button class="btn" id="agreeBtn" type="button">동의하고 보내기</button>
+  <button class="cancel" id="cancelBtn" type="button">돌아가서 더 확인하기</button>
+</div>
+
+<!-- ══════ 완료 화면 ══════ -->
+<div id="done" hidden>
+  <main>
+    <div class="wrap center">
+      <div class="mark">✓</div>
+      <h1>신청서가<br>전달되었습니다</h1>
+      <p>확인 후 남겨주신 연락처로<br>결제 안내를 드리겠습니다.</p>
+      <p style="margin-top:24px">급한 문의는 인스타그램 DM<br>
+        <a href="https://www.instagram.com/singing_yogi_yeahangel/">@singing_yogi_yeahangel</a></p>
+      <p style="margin-top:34px;font-size:13px"><a href="index.html">← 수업 소개로 돌아가기</a></p>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ────────────────────────────────────────────────
+   Apps Script 웹 앱 URL을 아래에 붙여넣으세요.
+   설정 방법: 신청폼/README.md
+   예) https://script.google.com/macros/s/AKfy.../exec
+   ──────────────────────────────────────────────── */
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-95zz7aoxpPYylFsnFL2YhVDFGKXEF46FcbWkkW5lpIzxq/exec';
+
+(function () {
+  const flow    = document.getElementById('flow');
+  const done    = document.getElementById('done');
+  const steps   = [...flow.querySelectorAll('.step')];
+  const bar     = document.getElementById('bar');
+  const count   = document.getElementById('count');
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const errBox  = document.getElementById('err');
+  const review  = document.getElementById('review');
+
+  let i = 0;
+  let returningToReview = false;   // 확인 화면에서 '수정'으로 빠져나온 상태
+
+  if (!ENDPOINT) document.getElementById('setupWarn').hidden = false;
+
+
+  /* ── 화면 전환 ── */
+  function go(n) {
+    i = n;
+    steps.forEach((s, k) => { s.hidden = k !== n; });
+    clearNotice(errBox);
+
+    const act = activeSteps();
+    const pos = act.indexOf(n);
+    const last = n === act[act.length - 1];
+    count.textContent = (pos + 1) + ' / ' + act.length;
+    bar.style.width = ((pos + 1) / act.length * 100) + '%';
+    backBtn.textContent = n === 0 ? '← 수업 소개' : '← 뒤로';
+    nextBtn.textContent = last ? '신청서 보내기'
+                        : (returningToReview ? '확인 화면으로' : '다음');
+    // 선택 항목에서는 답을 했든 안 했든 항상 빠져나갈 길을 열어둡니다.
+    // 라디오는 스스로 해제되지 않으므로, 이 버튼이 유일한 취소 수단입니다.
+    skipBtn.hidden = !steps[n].hasAttribute('data-optional');
+    skipBtn.textContent = answered(n) ? '답하지 않기' : '건너뛰기';
+
+    if (last) buildReview();
+    scrollTo(0, 0);
+    steps[n].querySelector('.q').focus({ preventScroll: true });
+  }
+
+  /* 전체 패스는 모든 회차가 포함되므로 날짜를 고를 이유가 없어 그 단계를 건너뜁니다 */
+  function activeSteps() {
+    return steps.map(function (s, k) { return k; }).filter(function (k) {
+      return !(steps[k].dataset.key === 'dates' && quota() === 0);
+    });
+  }
+
+  function step(from, dir) {
+    const act = activeSteps();
+    const t = act[act.indexOf(from) + dir];
+    return t === undefined ? from : t;
+  }
+
+  function answered(n) {
+    const s = steps[n];
+    if (s.dataset.key === 'notes') return s.querySelector('textarea').value.trim() !== '';
+    return !!s.querySelector('input:checked');
+  }
+
+  function advance() {
+    if (returningToReview) { returningToReview = false; go(steps.length - 1); }
+    else go(step(i, 1));
+  }
+
+  /* 안내는 6초 뒤 스스로 내려갑니다. 입력칸 위에 떠 있어 오래 남으면
+     방해가 되고, 못 읽고 놓쳐도 '다음'을 다시 누르면 그대로 다시 뜹니다.
+     짧은 문장을 두 번 읽을 여유는 두었습니다. */
+  const NOTICE_MS = 6000;
+  const timers = new WeakMap();
+
+  function notice(box, msg) {
+    box.textContent = msg;
+    box.hidden = false;
+    clearTimeout(timers.get(box));
+    timers.set(box, setTimeout(function () { box.hidden = true; }, NOTICE_MS));
+  }
+
+  function clearNotice(box) {
+    clearTimeout(timers.get(box));
+    box.hidden = true;
+  }
+
+  function fail(msg) {
+    notice(errBox, msg);
+  }
+
+  /* ── 값 읽기 ── */
+  const val = {
+    pass:       () => (flow.querySelector('input[name=pass]:checked') || {}).value || '',
+    dates:      () => flow.querySelector('#dates').value,
+    experience: () => (flow.querySelector('input[name=experience]:checked') || {}).value || '',
+    pregnant:   () => (flow.querySelector('input[name=pregnant]:checked') || {}).value || '',
+    notes:      () => flow.querySelector('textarea[name=notes]').value.trim(),
+    // form.name / form.phone 은 폼 자체의 내장 속성과 부딪히므로 직접 조회합니다
+    name:       () => flow.querySelector('#name').value.trim(),
+    phone:      () => flow.querySelector('#phone').value.trim(),
+    consent:       () => document.getElementById('consent').checked,
+    consentHealth: () => document.getElementById('consentHealth').checked
+  };
+
+  /* ── 단계별 검증 ── */
+  function validate() {
+    const key = steps[i].dataset.key;
+    if (key === 'pass'    && !val.pass())    return '수강권을 골라주세요.';
+    if (key === 'dates') {
+      const need = quota(), got = chosen().length;
+      if (got !== need) {
+        return need === 1 ? '오실 날짜를 하루 골라주세요.'
+                          : '오실 날짜를 ' + need + '일 골라주세요. (지금 ' + got + '일)';
+      }
+    }
+    if (key === 'contact') {
+      if (!val.name())  return '이름을 적어주세요.';
+      if (!val.phone()) return '연락처를 적어주세요.';
+      // 010 은 11자리 고정, 011·016~019 는 10자리 또는 11자리
+      if (!/^(010\d{8}|01[16789]\d{7,8})$/.test(val.phone().replace(/\D/g, '')))
+        return '휴대폰 번호를 다시 확인해주세요. 예) 010-1234-5678';
+    }
+    return null;
+  }
+
+  /* ── 확인 화면 ── */
+  function buildReview() {
+    const rows = [
+      ['수강권',    val.pass(),       0],
+      ['오는 날짜', quota() === 0 ? '9월 전체 수업' : val.dates(), 1],
+      ['요가 경험', val.experience(), 2],
+      ['임신 여부', val.pregnant(),   3],
+      ['특이사항',  val.notes(),      4],
+      ['이름',      val.name(),       5],
+      ['연락처',    val.phone(),      5]
+    ];
+    review.innerHTML = '';
+    rows.forEach(([k, v, target]) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML =
+        '<span class="k"></span><span class="v"></span><button type="button" class="edit">수정</button>';
+      row.querySelector('.k').textContent = k;
+      const vEl = row.querySelector('.v');
+      vEl.textContent = v || '적지 않음';
+      if (!v) vEl.classList.add('empty');
+      row.querySelector('.edit').addEventListener('click', function () {
+        returningToReview = true;
+        go(target);
+      });
+      review.appendChild(row);
+    });
+  }
+
+  /* ── 버튼 ── */
+  nextBtn.addEventListener('click', function () {
+    const msg = validate();
+    if (msg) return fail(msg);
+    if (i === steps.length - 1) openSheet();
+    else advance();
+  });
+
+  function clearStep(n) {
+    steps[n].querySelectorAll('input').forEach(function (el) { el.checked = false; });
+    steps[n].querySelectorAll('textarea').forEach(function (el) { el.value = ''; });
+  }
+
+  skipBtn.addEventListener('click', function () {
+    // 답이 있으면 지우고 그 자리에 머무릅니다.
+    // 선택이 풀리는 걸 눈으로 확인한 뒤에 넘어가도록 두 동작을 나눴습니다.
+    if (answered(i)) {
+      clearStep(i);
+      skipBtn.textContent = '건너뛰기';
+      clearNotice(errBox);
+      steps[i].querySelector('.q').focus({ preventScroll: true });
+      return;
+    }
+    advance();
+  });
+
+  backBtn.addEventListener('click', function () {
+    // 첫 질문에서는 왔던 곳(수업 소개)으로 — 시작 화면이 하던 역할을 대신합니다
+    if (i === 0) { location.href = 'index.html'; return; }
+    returningToReview = false;
+    go(step(i, -1));
+  });
+
+  /* 선택해도 화면을 자동으로 넘기지 않습니다.
+     예고 없는 화면 전환은 WCAG 3.2.2(On Input) 위반이고,
+     잘못 눌렀을 때 되돌릴 틈이 없습니다. 넘기는 건 사용자가 정합니다. */
+  flow.addEventListener('change', function (e) {
+    if (e.target.type === 'checkbox' || e.target.type === 'radio') {
+      skipBtn.textContent = answered(i) ? '답하지 않기' : '건너뛰기';
+      clearNotice(errBox);
+    }
+  });
+
+  /* 텍스트 입력은 change 가 blur 때만 오고 type 도 'textarea' 라
+     위 조건에 걸리지 않습니다. 타이핑 중에도 버튼 문구가 따라오도록 따로 답니다. */
+  flow.addEventListener('input', function (e) {
+    // 고치기 시작하면 안내를 치웁니다. 입력칸 위에 떠 있어 방해가 되기 때문입니다.
+    clearNotice(errBox);
+
+    if (e.target.tagName === 'TEXTAREA') {
+      skipBtn.textContent = answered(i) ? '답하지 않기' : '건너뛰기';
+    }
+  });
+
+  /* 입력칸을 다시 누르기만 해도 치웁니다 (아직 한 글자도 안 고쳤을 때) */
+  flow.addEventListener('focusin', function (e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') clearNotice(errBox);
+  });
+
+  /* ── 전화번호 ── */
+  const phoneEl = flow.querySelector('#phone');
+
+  // 010 은 3-4-4, 나머지(011·016~019)는 3-3-4 로 끊습니다
+  function formatPhone(v) {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length < 4) return d;
+    if (d.startsWith('010') || d.length > 10) {
+      return d.length < 8 ? d.slice(0, 3) + '-' + d.slice(3)
+                          : d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+    }
+    return d.length < 7 ? d.slice(0, 3) + '-' + d.slice(3)
+                        : d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+  }
+
+  phoneEl.addEventListener('input', function () {
+    // 중간을 고치는 중이면 커서가 튀므로 끝에서 입력할 때만 다시 씁니다
+    if (phoneEl.selectionStart !== phoneEl.value.length) return;
+    phoneEl.value = formatPhone(phoneEl.value);
+  });
+
+  /* 연락처 입력 중 Enter → 다음 */
+  flow.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+      e.preventDefault();
+      nextBtn.click();
+    }
+  });
+
+  /* ── 동의 시트 ── */
+  const scrim     = document.getElementById('scrim');
+  const sheet     = document.getElementById('sheet');
+  const sheetErr  = document.getElementById('sheetErr');
+  const agreeBtn  = document.getElementById('agreeBtn');
+  let lastFocus = null;
+
+  function focusables() {
+    return [...sheet.querySelectorAll('input,button')].filter(function (el) {
+      return !el.disabled && el.offsetParent !== null;   // 숨겨진 동의 항목은 건너뜁니다
+    });
+  }
+
+  const healthConsent = document.getElementById('healthConsent');
+  const consentHealthEl = document.getElementById('consentHealth');
+
+  /* 건강정보를 적지 않으셨다면 수집할 민감정보 자체가 없으므로
+     동의를 묻지 않습니다. 없는 것에 대한 동의를 받을 수는 없습니다. */
+  function healthGiven() {
+    return !!(val.pregnant() || val.notes());
+  }
+
+  function openSheet() {
+    lastFocus = document.activeElement;
+    sheetErr.hidden = true;
+
+    const need = healthGiven();
+    healthConsent.hidden = !need;
+    if (!need) consentHealthEl.checked = false;   // 지웠다가 다시 열었을 때 남지 않도록
+    scrim.hidden = false;
+    sheet.hidden = false;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function () {
+      scrim.classList.add('on');
+      sheet.classList.add('on');
+      document.getElementById('sheetTitle').focus({ preventScroll: true });
+    });
+  }
+
+  function closeSheet() {
+    scrim.classList.remove('on');
+    sheet.classList.remove('on');
+    document.body.style.overflow = '';
+    setTimeout(function () {
+      scrim.hidden = true;
+      sheet.hidden = true;
+    }, 260);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+
+  sheet.addEventListener('change', function () { clearNotice(sheetErr); });
+  document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+  scrim.addEventListener('click', closeSheet);
+
+  document.addEventListener('keydown', function (e) {
+    if (sheet.hidden) return;
+    if (e.key === 'Escape') { closeSheet(); return; }
+    if (e.key !== 'Tab') return;
+    // 포커스를 시트 안에 가둡니다 — 없으면 키보드 사용자가 뒤 화면으로 새어나갑니다
+    const f = focusables();
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  agreeBtn.addEventListener('click', function () {
+    if (!val.consent()) {
+      notice(sheetErr, '개인정보 수집 · 이용에 동의해주셔야 신청할 수 있습니다.');
+      return;
+    }
+    if (healthGiven() && !val.consentHealth()) {
+      notice(sheetErr, '건강정보 수집 · 이용에 동의해주셔야 신청할 수 있습니다.');
+      return;
+    }
+    closeSheet();
+    submit();
+  });
+
+  /* ── 오고 싶은 날짜 ── */
+  const datesEl   = flow.querySelector('#dates');
+  const picked    = document.getElementById('picked');
+  const datesHelp = document.getElementById('datesHelp');
+  const NOTE = '9/25는 추석 연휴로 쉽니다';
+
+  /* 고를 수 있는 날짜 수. 전체 패스는 모든 회차가 포함되므로 0 = 이 단계를 건너뜁니다. */
+  function quota() {
+    const p = val.pass();
+    if (p.indexOf('1회권') === 0) return 1;
+    if (p.indexOf('4회권') === 0) return 4;
+    return 0;
+  }
+
+  function dayButtons() { return [...flow.querySelectorAll('.cal .d')]; }
+
+  function chosen() {
+    return dayButtons().filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; });
+  }
+
+  function clearDates() {
+    dayButtons().forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+    datesEl.value = '';
+  }
+
+  function renderDates() {
+    const need = quota(), list = chosen();
+    datesEl.value = list.map(function (b) { return b.dataset.date + ' · ' + b.dataset.cls; }).join(', ');
+
+    datesHelp.textContent = (need === 1 ? '1회권은 하루를' : '4회권은 네 날짜를') +
+      ' 고르실 수 있습니다. 수요일은 차크라, 금요일은 프라나야마입니다.';
+
+    if (!list.length) {
+      picked.textContent = NOTE;
+      picked.classList.add('none');
+      return;
+    }
+    picked.classList.remove('none');
+    picked.textContent = need === 1
+      ? list[0].dataset.date + ' · ' + list[0].dataset.cls
+      : list.length + ' / ' + need + '일 선택 — ' +
+        list.map(function (b) { return b.dataset.date.replace('9월 ', ''); }).join(', ');
+  }
+
+  dayButtons().forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const need = quota();
+      const on = btn.getAttribute('aria-pressed') === 'true';
+
+      if (on) {                              // 눌린 날을 다시 누르면 해제
+        btn.setAttribute('aria-pressed', 'false');
+      } else if (need === 1) {               // 1회권은 고르면 이전 선택을 대체
+        clearDates();
+        btn.setAttribute('aria-pressed', 'true');
+      } else if (chosen().length >= need) {  // 정해진 수를 넘기면 막고 알려줍니다
+        notice(errBox, need + '일까지 고르실 수 있습니다. 바꾸시려면 고른 날짜를 다시 눌러 해제해주세요.');
+        return;
+      } else {
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      clearNotice(errBox);
+      renderDates();
+    });
+  });
+
+  /* 수강권을 바꾸면 고를 수 있는 수가 달라지므로 날짜 선택을 비웁니다 */
+  flow.addEventListener('change', function (e) {
+    if (e.target.name === 'pass') { clearDates(); renderDates(); }
+  });
+
+  /* ── 전송 ── */
+  async function submit() {
+    if (!ENDPOINT)
+      return fail('아직 접수 주소가 연결되지 않았습니다. 인스타그램 DM으로 신청해주세요.');
+
+    nextBtn.disabled = true;
+    nextBtn.textContent = '보내는 중…';
+
+    /* FormData 를 쓰면 multipart/form-data 로 나가는데, Apps Script 는 multipart 를
+       파싱하지 못해 e.parameter 가 통째로 빕니다. URLSearchParams 로 보내면
+       application/x-www-form-urlencoded; charset=UTF-8 이 되어 한글도 그대로 들어갑니다. */
+    const fd = new URLSearchParams();
+    fd.set('pass',          val.pass());
+    fd.set('dates',         quota() === 0 ? '9월 전체 수업' : val.dates());
+    fd.set('experience',    val.experience());
+    fd.set('pregnant',      val.pregnant());
+    fd.set('notes',         val.notes());
+    fd.set('name',          val.name());
+    fd.set('phone',         val.phone());
+    fd.set('consent',       val.consent() ? '동의' : '');
+    fd.set('consentHealth', healthGiven() ? (val.consentHealth() ? '동의' : '') : '해당 없음');
+    fd.set('website',       flow.querySelector('#website').value);   // 함정 칸 (사람은 늘 빈 값)
+
+    try {
+      // Apps Script는 리다이렉트 응답에 CORS 헤더가 없어 no-cors로 보냅니다.
+      // 응답을 읽을 수 없으므로 전송 성공을 낙관적으로 처리합니다.
+      await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: fd });
+      flow.hidden = true;
+      done.hidden = false;
+      scrollTo(0, 0);
+    } catch (err) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = '신청서 보내기';
+      fail('전송에 실패했습니다. 잠시 후 다시 시도하시거나 인스타그램 DM으로 신청해주세요.');
+    }
+  }
+  // 값·달력 초기화가 모두 끝난 뒤에 첫 화면을 그립니다
+  renderDates();
+  go(0);
+
+})();
+</script>
+</body>
+</html>
