@@ -45,6 +45,7 @@
      눈에 보이는 포커스 링은 지웁니다. 클릭한 것처럼 보이기만 합니다. */
   .q:focus{outline:none}
   .help{font-size:14px;color:var(--ink-soft);line-height:1.75;margin-bottom:28px}
+  .help .note-inline{color:var(--sage)}
 
   .opts{display:flex;flex-direction:column;gap:10px}
   .opt{display:flex;align-items:flex-start;gap:13px;background:#fff;
@@ -97,6 +98,8 @@
                letter-spacing:.08em}
   table.cal td{padding:3px 0;font-size:14px;color:var(--oat);height:52px}
   .d{width:44px;height:44px;border:0;border-radius:50%;background:none;
+     /* span 으로도 쓰이므로(10월 참고) inline 기본값에서는 크기가 먹지 않습니다 */
+     display:inline-grid;place-items:center;
      font:inherit;font-size:15px;color:var(--ink);cursor:pointer;
      /* 아래 선택 상태가 덮어쓸 수 있도록 background 단축 대신 longhand 사용 */
      transition:background .15s,color .15s}
@@ -109,6 +112,19 @@
   .picked{margin-top:22px;padding:15px 18px;background:var(--ivory-deep);
           font-size:15px;text-align:center;color:var(--ink)}
   .picked.none{color:var(--ink-soft)}
+  .picked b{font-weight:400;color:var(--olive)}
+  .picked span{display:block;font-size:13px;color:var(--ink-soft);margin-top:4px}
+
+  /* 10월은 고를 수 없는 참고용이라 조금 물러나 보이게 둡니다 */
+  .cal-head .ref-tag{font-size:12px;letter-spacing:.08em;color:var(--sage);margin-left:6px}
+  .d.ref{cursor:default;opacity:.55}
+  /* 시작일 이후 실제로 나오게 되는 날 */
+  .d.attend{box-shadow:inset 0 0 0 2px var(--rose-deep);opacity:1}
+  .cal + .cal-head{margin-top:30px}
+  .notice-box{margin-top:12px;padding:15px 18px;background:var(--ivory-deep);
+              font-size:13px;line-height:1.85;color:var(--ink-soft)}
+  .notice-box b{display:block;font-weight:400;color:var(--olive);margin-bottom:6px}
+  .notice-box .hl{display:block;margin-top:8px;color:var(--rose)}
 
   /* ── 하단 버튼 ── */
   .foot{position:sticky;bottom:0;background:var(--ivory);
@@ -198,45 +214,48 @@
       <!-- 2 ─ 수강권 -->
       <section class="step" data-key="pass" hidden>
         <h2 class="q" tabindex="-1">수강권을<br>골라주세요</h2>
-        <p class="help">9월에 열리는 수업은 수요일 5회, 금요일 3회로 모두 8회입니다.</p>
+        <p class="help">시작일부터 4주가 수강 기간입니다. 그 안에서 원하시는 날에 나오시면 되고, 나오실 날짜를 미리 정하지 않으셔도 됩니다. 휴강 시 수강권 기간이 연장되어, 약속한 횟수를 모두 채우실 수 있습니다.</p>
         <div class="opts">
           <label class="opt">
             <input type="radio" name="pass" value="1회권 30,000원">
             <span class="t">1회권<span class="s">30,000원</span></span>
           </label>
           <label class="opt">
-            <input type="radio" name="pass" value="4회권 110,000원">
-            <span class="t">4회권<span class="s">110,000원 · 4주 내 사용</span></span>
+            <input type="radio" name="pass" value="4주 4회권 110,000원">
+            <span class="t">4주 4회권<span class="s">110,000원 · 원하시는 날 4회</span></span>
           </label>
           <label class="opt">
-            <input type="radio" name="pass" value="9월 전체 패스 200,000원">
-            <span class="t">9월 전체 패스<span class="s">200,000원 · 8회, 9월에 열리는 수업 모두</span></span>
+            <input type="radio" name="pass" value="4주 8회권 200,000원">
+            <span class="t">4주 8회권<span class="s">200,000원 · 원하시는 날 8회</span></span>
           </label>
         </div>
       </section>
 
-      <!-- 오고 싶은 날짜 -->
+      <!-- 시작일 -->
       <section class="step" data-key="dates" hidden>
-        <h2 class="q" tabindex="-1">언제<br>오시겠어요?</h2>
-        <p class="help" id="datesHelp">수업이 열리는 날만 고르실 수 있습니다.</p>
+        <h2 class="q" tabindex="-1">언제부터<br>나오시겠어요?</h2>
+        <p class="help">시작하실 날짜 하루만 고르시면 됩니다. 그날부터 4주가 수강 기간이고, 그 안에 열리는 수업이 달력에 표시됩니다.</p>
         <input type="hidden" id="dates" value="">
-        <div class="cal-head">2026. 9</div>
+
         <div class="legend">
           <span><i class="dot w"></i>수 · 차크라</span>
           <span><i class="dot f"></i>금 · 프라나야마</span>
         </div>
-        <table class="cal">
-          <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
-          <tbody>
-          <tr><td></td><td></td><td>1</td><td><button type="button" class="d w" data-date="9월 2일" data-cls="차크라" aria-pressed="false" aria-label="9월 2일 수요일 차크라">2</button></td><td>3</td><td><button type="button" class="d f" data-date="9월 4일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 4일 금요일 프라나야마">4</button></td><td>5</td></tr>
-          <tr><td>6</td><td>7</td><td>8</td><td><button type="button" class="d w" data-date="9월 9일" data-cls="차크라" aria-pressed="false" aria-label="9월 9일 수요일 차크라">9</button></td><td>10</td><td><button type="button" class="d f" data-date="9월 11일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 11일 금요일 프라나야마">11</button></td><td>12</td></tr>
-          <tr><td>13</td><td>14</td><td>15</td><td><button type="button" class="d w" data-date="9월 16일" data-cls="차크라" aria-pressed="false" aria-label="9월 16일 수요일 차크라">16</button></td><td>17</td><td><button type="button" class="d f" data-date="9월 18일" data-cls="프라나야마" aria-pressed="false" aria-label="9월 18일 금요일 프라나야마">18</button></td><td>19</td></tr>
-          <tr><td>20</td><td>21</td><td>22</td><td><button type="button" class="d w" data-date="9월 23일" data-cls="차크라" aria-pressed="false" aria-label="9월 23일 수요일 차크라">23</button></td><td>24</td><td><span class="off">25</span></td><td>26</td></tr>
-          <tr><td>27</td><td>28</td><td>29</td><td><button type="button" class="d w" data-date="9월 30일" data-cls="차크라" aria-pressed="false" aria-label="9월 30일 수요일 차크라">30</button></td><td></td><td></td><td></td></tr>
-          </tbody>
-        </table>
-        <p class="picked none" id="picked" aria-live="polite">9/25는 추석 연휴로 쉽니다</p>
+
+        <div id="cals"></div>
+
+        <p class="picked none" id="picked" aria-live="polite">시작하실 날짜를 골라주세요</p>
+
+        <div class="notice-box">
+          <b>휴강 안내</b>
+          9/25 (금) 추석 연휴<br>
+          10/9 (금) 한글날<br>
+          10/14 (수) · 10/16 (금) 강사 교육 일정<br>
+          11월 휴강 일정은 아직 정해지지 않았습니다<br>
+          <span class="hl">휴강이 생기거나 일정이 바뀌어도, 기간을 연장해 약속한 횟수를 모두 채워드립니다.</span>
+        </div>
       </section>
+
 
       <!-- 3 ─ 요가 경험 -->
       <section class="step" data-key="experience" data-optional hidden>
@@ -252,7 +271,7 @@
       <!-- 4 ─ 임신 여부 -->
       <section class="step" data-key="pregnant" data-optional hidden>
         <h2 class="q" tabindex="-1">임신 중이신가요?</h2>
-        <p class="help">임신 중이셔도 참여하실 수 있습니다. 그에 맞춰 안내해 드리려 여쭙는 것이니, 답하지 않고 넘어가셔도 괜찮습니다.</p>
+        <p class="help">임신 중이셔도 참여하실 수 있습니다. 그에 맞춰 안내해 드리려 여쭙는 것이니, 답하지 않고 넘어가셔도 괜찮습니다. <span class="note-inline">‘해당 없음’은 따로 저장하지 않습니다.</span></p>
         <div class="opts">
           <label class="opt"><input type="radio" name="pregnant" value="해당 없음"><span class="t">해당 없음</span></label>
           <label class="opt"><input type="radio" name="pregnant" value="임신 중"><span class="t">임신 중입니다</span></label>
@@ -308,7 +327,7 @@
 
   <div class="cbox">
     <b>개인정보 수집 · 이용 동의</b><br>
-    수집 항목: 이름, 연락처, 수강권, 요가 경험<br>
+    수집 항목: 이름, 연락처, 수강권, 시작일, 요가 경험<br>
     이용 목적: 수업 신청 접수, 결제 및 수업 안내<br>
     보유 기간: 수업 종료 후 3개월 이내 파기
   </div>
@@ -387,11 +406,9 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
     steps.forEach((s, k) => { s.hidden = k !== n; });
     clearNotice(errBox);
 
-    const act = activeSteps();
-    const pos = act.indexOf(n);
-    const last = n === act[act.length - 1];
-    count.textContent = (pos + 1) + ' / ' + act.length;
-    bar.style.width = ((pos + 1) / act.length * 100) + '%';
+    const last = n === steps.length - 1;
+    count.textContent = (n + 1) + ' / ' + steps.length;
+    bar.style.width = ((n + 1) / steps.length * 100) + '%';
     backBtn.textContent = n === 0 ? '← 수업 소개' : '← 뒤로';
     nextBtn.textContent = last ? '신청서 보내기'
                         : (returningToReview ? '확인 화면으로' : '다음');
@@ -405,17 +422,8 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
     steps[n].querySelector('.q').focus({ preventScroll: true });
   }
 
-  /* 전체 패스는 모든 회차가 포함되므로 날짜를 고를 이유가 없어 그 단계를 건너뜁니다 */
-  function activeSteps() {
-    return steps.map(function (s, k) { return k; }).filter(function (k) {
-      return !(steps[k].dataset.key === 'dates' && quota() === 0);
-    });
-  }
-
   function step(from, dir) {
-    const act = activeSteps();
-    const t = act[act.indexOf(from) + dir];
-    return t === undefined ? from : t;
+    return Math.min(Math.max(from + dir, 0), steps.length - 1);
   }
 
   function answered(n) {
@@ -469,13 +477,7 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
   function validate() {
     const key = steps[i].dataset.key;
     if (key === 'pass'    && !val.pass())    return '수강권을 골라주세요.';
-    if (key === 'dates') {
-      const need = quota(), got = chosen().length;
-      if (got !== need) {
-        return need === 1 ? '오실 날짜를 하루 골라주세요.'
-                          : '오실 날짜를 ' + need + '일 골라주세요. (지금 ' + got + '일)';
-      }
-    }
+    if (key === 'dates' && !val.dates()) return '시작하실 날짜를 골라주세요.';
     if (key === 'contact') {
       if (!val.name())  return '이름을 적어주세요.';
       if (!val.phone()) return '연락처를 적어주세요.';
@@ -490,7 +492,7 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
   function buildReview() {
     const rows = [
       ['수강권',    val.pass(),       0],
-      ['오는 날짜', quota() === 0 ? '9월 전체 수업' : val.dates(), 1],
+      ['시작일',    val.dates(),      1],
       ['요가 경험', val.experience(), 2],
       ['임신 여부', val.pregnant(),   3],
       ['특이사항',  val.notes(),      4],
@@ -621,8 +623,11 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
 
   /* 건강정보를 적지 않으셨다면 수집할 민감정보 자체가 없으므로
      동의를 묻지 않습니다. 없는 것에 대한 동의를 받을 수는 없습니다. */
+  /* '해당 없음' 은 남길 이유가 없는 답입니다. 알아야 할 것은 임신 중인 경우뿐이고,
+     비어 있는 칸과 '해당 없음' 은 수업 준비에 같은 뜻입니다. 저장하지 않으므로
+     수집할 건강정보도 없고, 그래서 동의도 묻지 않습니다. */
   function healthGiven() {
-    return !!(val.pregnant() || val.notes());
+    return val.pregnant() === '임신 중' || !!val.notes();
   }
 
   function openSheet() {
@@ -681,74 +686,171 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
     submit();
   });
 
-  /* ── 오고 싶은 날짜 ── */
-  const datesEl   = flow.querySelector('#dates');
-  const picked    = document.getElementById('picked');
-  const datesHelp = document.getElementById('datesHelp');
-  const NOTE = '9/25는 추석 연휴로 쉽니다';
+  /* ── 시작일 달력 ──────────────────────────────────
+     9월(선택 가능)과 10월(참고)을 한 데이터로 그립니다. 시작일을 고르면
+     수강권 횟수만큼 실제로 나오게 될 날에 표시가 붙습니다. */
 
-  /* 고를 수 있는 날짜 수. 전체 패스는 모든 회차가 포함되므로 0 = 이 단계를 건너뜁니다. */
-  function quota() {
+  const datesEl = flow.querySelector('#dates');
+  const picked  = document.getElementById('picked');
+
+  const W = '차크라', F = '프라나야마';
+  // [월, 일, 요일코드, 수업, 휴강여부]
+  const CLASS_DAYS = [
+    [9, 2,'w',W,0],[9, 4,'f',F,0],[9, 9,'w',W,0],[9,11,'f',F,0],
+    [9,16,'w',W,0],[9,18,'f',F,0],[9,23,'w',W,0],[9,25,'f',F,1],[9,30,'w',W,0],
+    [10, 2,'f',F,0],[10, 7,'w',W,0],[10, 9,'f',F,1],[10,14,'w',W,1],
+    [10,16,'f',F,1],[10,21,'w',W,0],[10,23,'f',F,0],[10,28,'w',W,0],[10,30,'f',F,0],
+    [11, 4,'w',W,0],[11, 6,'f',F,0],[11,11,'w',W,0],[11,13,'f',F,0],
+    [11,18,'w',W,0],[11,20,'f',F,0],[11,25,'w',W,0],[11,27,'f',F,0]
+  ].map(function (d) {
+    const pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    return { m:d[0], day:d[1], kind:d[2], cls:d[3], off:!!d[4],
+             key:d[0]+'-'+d[1], iso:'2026-'+pad(d[0])+'-'+pad(d[1]) };
+  });
+
+  const MONTHS = [
+    { m:9,  label:'2026. 9',  first:2, len:30, pick:true  },   // 9/1 = 화요일
+    { m:10, label:'2026. 10', first:4, len:31, pick:false },   // 10/1 = 목요일
+    { m:11, label:'2026. 11', first:0, len:30, pick:false }    // 11/1 = 일요일
+  ];
+
+  /* 실제로 나오시는 횟수 */
+  function sessions() {
     const p = val.pass();
     if (p.indexOf('1회권') === 0) return 1;
-    if (p.indexOf('4회권') === 0) return 4;
+    if (p.indexOf('4주 4회권') === 0) return 4;
+    if (p.indexOf('4주 8회권') === 0) return 8;
     return 0;
   }
 
-  function dayButtons() { return [...flow.querySelectorAll('.cal .d')]; }
-
-  function chosen() {
-    return dayButtons().filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; });
+  /* 달력에 표시할 기간. 4주 = 수·금 8회가 열리는 창입니다.
+     4회권은 그 8일 가운데 원하시는 4일에 나오시면 되므로 창은 같습니다. */
+  function windowCount() {
+    return sessions() === 1 ? 1 : 8;
   }
 
-  function clearDates() {
-    dayButtons().forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-    datesEl.value = '';
+  function find(key) {
+    return CLASS_DAYS.find(function (d) { return d.key === key; });
+  }
+
+  /* 시작일부터 4주 동안 열리는 수업을 담습니다. 휴강일은 건너뜁니다. */
+  function planFrom(key) {
+    const i = CLASS_DAYS.findIndex(function (d) { return d.key === key; });
+    if (i < 0) return [];
+    return CLASS_DAYS.slice(i).filter(function (d) { return !d.off; }).slice(0, windowCount());
+  }
+
+  function buildCalendars() {
+    const html = MONTHS.map(function (mo) {
+      let cells = '', col = 0, out = '';
+      for (let i = 0; i < mo.first; i++) { cells += '<td></td>'; col++; }
+      for (let day = 1; day <= mo.len; day++) {
+        const d = find(mo.m + '-' + day);
+        if (!d) {
+          cells += '<td>' + day + '</td>';
+        } else if (d.off) {
+          cells += '<td><span class="off" title="휴강">' + day + '</span></td>';
+        } else if (mo.pick) {
+          cells += '<td><button type="button" class="d ' + d.kind + '" data-key="' + d.key +
+                   '" aria-pressed="false" aria-label="9월 ' + day + '일 ' +
+                   (d.kind === 'w' ? '수요일 ' : '금요일 ') + d.cls + ' 부터 시작">' + day + '</button></td>';
+        } else {
+          cells += '<td><span class="d ' + d.kind + ' ref" data-key="' + d.key + '">' + day + '</span></td>';
+        }
+        col++;
+        if (col % 7 === 0) { out += '<tr>' + cells + '</tr>'; cells = ''; }
+      }
+      if (cells) out += '<tr>' + cells + '</tr>';
+
+      return '<div class="cal-wrap" data-month="' + mo.m + '">' +
+             '<div class="cal-head">' + mo.label +
+             (mo.pick ? '' : ' <span class="ref-tag">참고</span>') + '</div>' +
+             '<table class="cal"><thead><tr>' +
+             ['일','월','화','수','목','금','토'].map(function (w) { return '<th>' + w + '</th>'; }).join('') +
+             '</tr></thead><tbody>' + out + '</tbody></table></div>';
+    }).join('');
+    document.getElementById('cals').innerHTML = html;
+  }
+
+  function cellFor(key) {
+    return document.querySelector('#cals [data-key="' + key + '"]');
+  }
+
+  function chosenKey() {
+    const b = document.querySelector('#cals .d[aria-pressed="true"]');
+    return b ? b.dataset.key : '';
   }
 
   function renderDates() {
-    const need = quota(), list = chosen();
-    datesEl.value = list.map(function (b) { return b.dataset.date + ' · ' + b.dataset.cls; }).join(', ');
+    document.querySelectorAll('#cals .attend').forEach(function (el) { el.classList.remove('attend'); });
 
-    datesHelp.textContent = (need === 1 ? '1회권은 하루를' : '4회권은 네 날짜를') +
-      ' 고르실 수 있습니다. 수요일은 차크라, 금요일은 프라나야마입니다.';
-
-    if (!list.length) {
-      picked.textContent = NOTE;
+    const key = chosenKey();
+    if (!key) {
+      datesEl.value = '';
+      picked.textContent = '시작하실 날짜를 골라주세요';
       picked.classList.add('none');
+      showMonths([]);
       return;
     }
+
+    const plan = planFrom(key);
+    plan.slice(1).forEach(function (d) {
+      const el = cellFor(d.key);
+      if (el) el.classList.add('attend');
+    });
+
+    const s = plan[0], e = plan[plan.length - 1];
+    const n = sessions();
+
+    datesEl.value = s.m + '월 ' + s.day + '일 · ' + s.cls;
     picked.classList.remove('none');
-    picked.textContent = need === 1
-      ? list[0].dataset.date + ' · ' + list[0].dataset.cls
-      : list.length + ' / ' + need + '일 선택 — ' +
-        list.map(function (b) { return b.dataset.date.replace('9월 ', ''); }).join(', ');
+
+    showMonths(plan);
+
+    const from = '<b>' + s.m + '월 ' + s.day + '일</b>';
+    /* 휴강이 바뀔 수 있다고 안내해두었으므로 날짜를 단정하지 않습니다 */
+    const to = '예상 종료 ' + e.m + '월 ' + e.day + '일';
+
+    if (n === 1) {
+      picked.innerHTML = from + ' · ' + s.cls;
+    } else if (n === 8) {
+      picked.innerHTML = from + '부터 4주 · 이 기간에 <b>8회</b><span>' + to +
+        ' · 나오실 날짜는 미리 정하지 않으셔도 됩니다</span>';
+    } else {
+      picked.innerHTML = from + '부터 4주 · 표시된 ' + plan.length +
+        '회 중 원하시는 <b>' + n + '회</b><span>' + to +
+        ' · 나오실 날짜는 미리 정하지 않으셔도 됩니다</span>';
+    }
   }
 
-  dayButtons().forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const need = quota();
-      const on = btn.getAttribute('aria-pressed') === 'true';
-
-      if (on) {                              // 눌린 날을 다시 누르면 해제
-        btn.setAttribute('aria-pressed', 'false');
-      } else if (need === 1) {               // 1회권은 고르면 이전 선택을 대체
-        clearDates();
-        btn.setAttribute('aria-pressed', 'true');
-      } else if (chosen().length >= need) {  // 정해진 수를 넘기면 막고 알려줍니다
-        notice(errBox, need + '일까지 고르실 수 있습니다. 바꾸시려면 고른 날짜를 다시 눌러 해제해주세요.');
-        return;
-      } else {
-        btn.setAttribute('aria-pressed', 'true');
-      }
-      clearNotice(errBox);
-      renderDates();
+  /* 고를 수 없는 달(10월·11월)은 그달까지 이어질 때만 펼칩니다.
+     9월 안에서 끝나는 일정에는 상관없는 정보라 화면만 길어집니다. */
+  function showMonths(plan) {
+    MONTHS.forEach(function (mo) {
+      if (mo.pick) return;
+      const el = document.querySelector('#cals [data-month="' + mo.m + '"]');
+      if (el) el.hidden = !plan.some(function (d) { return d.m === mo.m; });
     });
+  }
+
+  buildCalendars();
+  showMonths([]);
+
+  document.getElementById('cals').addEventListener('click', function (ev) {
+    const btn = ev.target.closest('button.d');
+    if (!btn) return;
+    const on = btn.getAttribute('aria-pressed') === 'true';
+    document.querySelectorAll('#cals .d[aria-pressed]').forEach(function (b) {
+      b.setAttribute('aria-pressed', 'false');
+    });
+    if (!on) btn.setAttribute('aria-pressed', 'true');
+    clearNotice(errBox);
+    renderDates();
   });
 
-  /* 수강권을 바꾸면 고를 수 있는 수가 달라지므로 날짜 선택을 비웁니다 */
+  /* 수강권이 바뀌면 나오는 횟수가 달라지므로 다시 그립니다 */
   flow.addEventListener('change', function (e) {
-    if (e.target.name === 'pass') { clearDates(); renderDates(); }
+    if (e.target.name === 'pass') renderDates();
   });
 
   /* ── 전송 ── */
@@ -764,9 +866,13 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyQWaDwTXOBUhM4xNl2qM-
        application/x-www-form-urlencoded; charset=UTF-8 이 되어 한글도 그대로 들어갑니다. */
     const fd = new URLSearchParams();
     fd.set('pass',          val.pass());
-    fd.set('dates',         quota() === 0 ? '9월 전체 수업' : val.dates());
+    /* 시트에서 날짜로 정렬·필터할 수 있도록 날짜와 수업명을 나눠 보냅니다.
+       사람이 읽는 '9월 30일 · 차크라' 는 확인 화면에서만 씁니다. */
+    const startDay = CLASS_DAYS.find(function (d) { return d.key === chosenKey(); });
+    fd.set('startDate',     startDay ? startDay.iso : '');
+    fd.set('startClass',    startDay ? startDay.cls : '');
     fd.set('experience',    val.experience());
-    fd.set('pregnant',      val.pregnant());
+    fd.set('pregnant',      val.pregnant() === '임신 중' ? '임신 중' : '');
     fd.set('notes',         val.notes());
     fd.set('name',          val.name());
     fd.set('phone',         val.phone());
